@@ -40,8 +40,8 @@ Hooks.once("init", async function () {
   // Register custom system settings
   registerSettings();
 
-  CONFIG.Actor.entityClass = OseActor;
-  CONFIG.Item.entityClass = OseItem;
+  CONFIG.Actor.documentClass = OseActor;
+  CONFIG.Item.documentClass = OseItem;
 
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);

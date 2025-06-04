@@ -3,7 +3,7 @@ export class OseCombat {
     // Check groups
     data.combatants = [];
     let groups = {};
-    combat.data.combatants.forEach((cbt) => {
+    combat.combatants.forEach((cbt) => {
       groups[cbt.flags.ose.group] = { present: true };
       data.combatants.push(cbt);
     });
@@ -22,7 +22,7 @@ export class OseCombat {
       if (!data.combatants[i].actor) {
         return;
       }
-      if (data.combatants[i].actor.data.data.isSlow) {
+      if (data.combatants[i].actor.system.isSlow) {
         data.combatants[i].initiative = -789;
       } else {
         data.combatants[i].initiative =
@@ -43,7 +43,7 @@ export class OseCombat {
   static async individualInitiative(combat, data) {
     let updates = [];
     let messages = [];
-    combat.data.combatants.forEach((c, i) => {
+    combat.combatants.forEach((c, i) => {
       // This comes from foundry.js, had to remove the update turns thing
       // Roll initiative
       const cf = combat._getInitiativeFormula(c);
@@ -73,8 +73,8 @@ export class OseCombat {
       if (i > 0) chatData.sound = null;   // Only play 1 sound for the whole set
       messages.push(chatData);
     });
-    await combat.updateEmbeddedEntity("Combatant", updates);
-    await CONFIG.ChatMessage.entityClass.create(messages);
+    await combat.updateEmbeddedDocuments("Combatant", updates);
+    await CONFIG.ChatMessage.documentClass.create(messages);
     data.turn = 0;
   }
 
@@ -123,7 +123,7 @@ export class OseCombat {
   static updateCombatant(combat, combatant, data) {
     let init = game.settings.get("ose", "initiative");
     // Why do you reroll ?
-    if (combatant.actor.data.data.isSlow) {
+    if (combatant.actor.system.isSlow) {
       data.initiative = -789;
       return;
     }
@@ -172,7 +172,7 @@ export class OseCombat {
       }
       let data = {};
       OseCombat.rollInitiative(game.combat, data);
-      game.combat.update({ data: data }).then(() => {
+      game.combat.update({ "system": data }).then(() => {
         game.combat.setupTurns();
       });
     });
@@ -181,7 +181,7 @@ export class OseCombat {
   static addCombatant(combat, data, options, id) {
     let token = canvas.tokens.get(data.tokenId);
     let color = "black";
-    switch (token.data.disposition) {
+    switch (token.document.disposition) {
       case -1:
         color = "red";
         break;
