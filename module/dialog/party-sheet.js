@@ -62,7 +62,7 @@ export class OsePartySheet extends FormApplication {
            </div>
         </form>`;
     let pcs = this.object.entities.filter((e) => {
-        return e.getFlag('ose', 'party') && e.data.type == "character";
+        return e.getFlag('ose', 'party') && e.type == "character";
     });
     new Dialog({
       title: "Deal Experience",

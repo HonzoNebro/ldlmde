@@ -143,7 +143,7 @@ export class OseActorSheet extends ActorSheet {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.getOwnedItem(li.data("itemId"));
       if (item.type == "weapon") {
-        if (this.actor.data.type === "monster") {
+        if (this.actor.type === "monster") {
           item.update({
             data: { counter: { value: item.system.counter.value - 1 } },
           });

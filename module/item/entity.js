@@ -13,7 +13,7 @@ export class OseItem extends Item {
   prepareData() {
     // Set default image
     let img = CONST.DEFAULT_TOKEN;
-    switch (this.data.type) {
+    switch (this.type) {
       case "spell":
         img = "/systems/ldlmde/assets/default/spell.png";
         break;
@@ -30,7 +30,7 @@ export class OseItem extends Item {
         img = "/systems/ldlmde/assets/default/item.png";
         break;
     }
-    if (!this.data.img) this.data.img = img;
+    if (!this.img) this.img = img;
     super.prepareData();
   }
 
@@ -49,10 +49,10 @@ export class OseItem extends Item {
     const props = [];
     const labels = this.labels;
 
-    if (this.data.type == "weapon") {
+    if (this.type == "weapon") {
       data.tags.forEach(t => props.push(t.value));
     }
-    if (this.data.type == "spell") {
+    if (this.type == "spell") {
       props.push(`${data.class} ${data.lvl}`, data.range, data.duration);
     }
     if (data.hasOwnProperty("equipped")) {
@@ -65,14 +65,14 @@ export class OseItem extends Item {
   }
 
   rollWeapon(options = {}) {
-    let isNPC = this.actor.data.type != "character";
+    let isNPC = this.actor.type != "character";
     const targets = 5;
     const data = this.system;
     let type = isNPC ? "attack" : "melee";
     const rollData =
     {
-      item: this.data,
-      actor: this.actor.data,
+      item: this,
+      actor: this.actor,
       roll: {
         save: this.system.save,
         target: null
@@ -122,8 +122,8 @@ export class OseItem extends Item {
     let type = data.rollType;
 
     const newData = {
-      actor: this.actor.data,
-      item: this.data,
+      actor: this.actor,
+      item: this,
       roll: {
         type: type,
         target: data.rollTarget,
@@ -145,9 +145,7 @@ export class OseItem extends Item {
 
   spendSpell() {
     this.update({
-      data: {
-        cast: this.system.cast - 1,
-      },
+      "system.cast": this.system.cast - 1,
     }).then(() => {
       this.show({ skipDialog: true });
     });
@@ -164,7 +162,7 @@ export class OseItem extends Item {
     };
 
     const data = this.system;
-    switch (this.data.type) {
+    switch (this.type) {
       case "weapon":
         let wTags = formatTag(data.damage, "fa-tint");
         data.tags.forEach((t) => {
@@ -281,12 +279,12 @@ export class OseItem extends Item {
     const templateData = {
       actor: this.actor,
       tokenId: token ? `${token.scene._id}.${token.id}` : null,
-      item: this.data,
+      item: this,
       data: this.getChatData(),
       labels: this.labels,
       isHealing: this.isHealing,
       hasDamage: this.hasDamage,
-      isSpell: this.data.type === "spell",
+      isSpell: this.type === "spell",
       hasSave: this.hasSave,
       config: CONFIG.OSE,
     };
