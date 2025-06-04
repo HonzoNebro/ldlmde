@@ -40,7 +40,7 @@ export class OseItem extends Item {
   }
 
   getChatData(htmlOptions) {
-    const data = duplicate(this.data.data);
+    const data = duplicate(this.system);
 
     // Rich text description
     data.description = TextEditor.enrichHTML(data.description, htmlOptions);
@@ -67,14 +67,14 @@ export class OseItem extends Item {
   rollWeapon(options = {}) {
     let isNPC = this.actor.data.type != "character";
     const targets = 5;
-    const data = this.data.data;
+    const data = this.system;
     let type = isNPC ? "attack" : "melee";
     const rollData =
     {
       item: this.data,
       actor: this.actor.data,
       roll: {
-        save: this.data.data.save,
+        save: this.system.save,
         target: null
       }
     };
@@ -111,7 +111,7 @@ export class OseItem extends Item {
   }
 
   async rollFormula(options = {}) {
-    const data = this.data.data;
+    const data = this.system;
     if (!data.roll) {
       throw new Error("This Item does not have a formula to roll!");
     }
@@ -146,7 +146,7 @@ export class OseItem extends Item {
   spendSpell() {
     this.update({
       data: {
-        cast: this.data.data.cast - 1,
+        cast: this.system.cast - 1,
       },
     }).then(() => {
       this.show({ skipDialog: true });
@@ -163,7 +163,7 @@ export class OseItem extends Item {
       return `<li class='tag'>${fa}${tag}</li>`;
     };
 
-    const data = this.data.data;
+    const data = this.system;
     switch (this.data.type) {
       case "weapon":
         let wTags = formatTag(data.damage, "fa-tint");
@@ -201,7 +201,7 @@ export class OseItem extends Item {
   }
 
   pushTag(values) {
-    const data = this.data.data;
+    const data = this.system;
     let update = [];
     if (data.tags) {
       update = duplicate(data.tags);
@@ -238,16 +238,16 @@ export class OseItem extends Item {
       update = values;
     }
     newData.tags = update;
-    return this.update({ data: newData });
+    return this.update({ "system": newData });
   }
 
   popTag(value) {
-    const data = this.data.data;
+    const data = this.system;
     let update = data.tags.filter((el) => el.value != value);
     let newData = {
       tags: update,
     };
-    return this.update({ data: newData });
+    return this.update({ "system": newData });
   }
 
   roll() {
@@ -259,7 +259,7 @@ export class OseItem extends Item {
         this.spendSpell();
         break;
       case "ability":
-        if (this.data.data.roll) {
+        if (this.system.roll) {
           this.rollFormula();
         } else {
           this.show();

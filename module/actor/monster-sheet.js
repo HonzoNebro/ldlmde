@@ -100,7 +100,7 @@ export class OseActorSheetMonster extends OseActorSheet {
     } else {
       link = `@RollTable[${data.id}]`;
     }
-    this.actor.update({ "data.details.treasure.table": link });
+    this.actor.update({ "system.details.treasure.table": link });
   }
   */
   /* -------------------------------------------- */
@@ -157,11 +157,11 @@ export class OseActorSheetMonster extends OseActorSheet {
     const item = this.actor.getOwnedItem(itemId);
     if (event.target.dataset.field == "value") {
       return item.update({
-        "data.counter.value": parseInt(event.target.value),
+        "system.counter.value": parseInt(event.target.value),
       });
     } else if (event.target.dataset.field == "max") {
       return item.update({
-        "data.counter.max": parseInt(event.target.value),
+        "system.counter.max": parseInt(event.target.value),
       });
     }
   }
@@ -250,7 +250,7 @@ export class OseActorSheetMonster extends OseActorSheet {
     html.find(".item-pattern").click(ev => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.getOwnedItem(li.data("itemId"));
-      let currentColor = item.data.data.pattern;
+      let currentColor = item.system.pattern;
       let colors = Object.keys(CONFIG.OSE.colors);
       let index = colors.indexOf(currentColor);
       if (index + 1 == colors.length) {
@@ -259,7 +259,7 @@ export class OseActorSheetMonster extends OseActorSheet {
         index++;
       }
       item.update({
-        "data.pattern": colors[index]
+        "system.pattern": colors[index]
       })
     });
 
