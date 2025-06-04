@@ -43,18 +43,21 @@ Hooks.once("init", async function () {
   CONFIG.Actor.documentClass = OseActor;
   CONFIG.Item.documentClass = OseItem;
 
-  // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("ose", OseActorSheetCharacter, {
+  // Register sheet application classes using the modern API
+  const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
+
+  DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
+  DocumentSheetConfig.registerSheet(Actor, "ldlmde", OseActorSheetCharacter, {
     types: ["character"],
     makeDefault: true,
   });
-  Actors.registerSheet("ose", OseActorSheetMonster, {
+  DocumentSheetConfig.registerSheet(Actor, "ldlmde", OseActorSheetMonster, {
     types: ["monster"],
     makeDefault: true,
   });
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("ose", OseItemSheet, { makeDefault: true });
+
+  DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
+  DocumentSheetConfig.registerSheet(Item, "ldlmde", OseItemSheet, { makeDefault: true });
 
   await preloadHandlebarsTemplates();
 });
