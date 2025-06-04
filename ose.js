@@ -40,21 +40,24 @@ Hooks.once("init", async function () {
   // Register custom system settings
   registerSettings();
 
-  CONFIG.Actor.entityClass = OseActor;
-  CONFIG.Item.entityClass = OseItem;
+  CONFIG.Actor.documentClass = OseActor;
+  CONFIG.Item.documentClass = OseItem;
 
-  // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("ose", OseActorSheetCharacter, {
+  // Register sheet application classes using the modern API
+  const DocumentSheetConfig = foundry.applications.apps.DocumentSheetConfig;
+
+  DocumentSheetConfig.unregisterSheet(Actor, "core", foundry.appv1.sheets.ActorSheet);
+  DocumentSheetConfig.registerSheet(Actor, "ldlmde", OseActorSheetCharacter, {
     types: ["character"],
     makeDefault: true,
   });
-  Actors.registerSheet("ose", OseActorSheetMonster, {
+  DocumentSheetConfig.registerSheet(Actor, "ldlmde", OseActorSheetMonster, {
     types: ["monster"],
     makeDefault: true,
   });
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("ose", OseItemSheet, { makeDefault: true });
+
+  DocumentSheetConfig.unregisterSheet(Item, "core", foundry.appv1.sheets.ItemSheet);
+  DocumentSheetConfig.registerSheet(Item, "ldlmde", OseItemSheet, { makeDefault: true });
 
   await preloadHandlebarsTemplates();
 });
@@ -94,14 +97,14 @@ Hooks.on("renderSidebarTab", async (object, html) => {
     ose.append(` <sub><a href="https://oldschoolessentials.necroticgnome.com/srd/index.php">SRD<a></sub>`);
 
     // License text
-    const template = "systems/ose/templates/chat/license.html";
+    const template = "systems/ldlmde/templates/chat/license.html";
     const rendered = await renderTemplate(template);
     gamesystem.append(rendered);
     
     // User guide
     let docs = html.find("button[data-action='docs']");
     const styling = "border:none;margin-right:2px;vertical-align:middle;margin-bottom:5px";
-    $(`<button data-action="userguide"><img src='/systems/ose/assets/dragon.png' width='16' height='16' style='${styling}'/>My blog</button>`).insertAfter(docs);
+    $(`<button data-action="userguide"><img src='/systems/ldlmde/assets/dragon.png' width='16' height='16' style='${styling}'/>My blog</button>`).insertAfter(docs);
     html.find('button[data-action="userguide"]').click(ev => {
       new FrameViewer('https://dmgamboa.blogspot.com', {resizable: true}).render(true);
     });

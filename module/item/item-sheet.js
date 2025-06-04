@@ -36,7 +36,7 @@ export class OseItemSheet extends ItemSheet {
   /** @override */
   get template() {
     const path = "systems/ldlmde/templates/items/";
-    return `${path}/${this.item.data.type}-sheet.html`;
+    return `${path}/${this.item.type}-sheet.html`;
   }
 
   /**
@@ -68,11 +68,11 @@ export class OseItemSheet extends ItemSheet {
       this.object.popTag(value);
     });
     html.find('a.melee-toggle').click(() => {
-      this.object.update({data: {melee: !this.object.data.data.melee}});
+      this.object.update({"system.melee": !this.object.system.melee});
     });
 
     html.find('a.missile-toggle').click(() => {
-      this.object.update({data: {missile: !this.object.data.data.missile}});
+      this.object.update({"system.missile": !this.object.system.missile});
     });
 
     super.activateListeners(html);
