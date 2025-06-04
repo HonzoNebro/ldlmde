@@ -54,10 +54,10 @@ export class OseActorSheet extends ActorSheet {
     var sortedSpells = {};
     var slots = {};
     for (var i = 0; i < spells.length; i++) {
-      let lvl = spells[i].data.lvl;
+      let lvl = spells[i].system.lvl;
       if (!sortedSpells[lvl]) sortedSpells[lvl] = [];
       if (!slots[lvl]) slots[lvl] = 0;
-      slots[lvl] += spells[i].data.memorized;
+      slots[lvl] += spells[i].system.memorized;
       sortedSpells[lvl].push(spells[i]);
     }
     data.slots = {
@@ -166,7 +166,7 @@ export class OseActorSheet extends ActorSheet {
       let element = event.currentTarget;
       let attack = element.parentElement.parentElement.dataset.attack;
       const rollData = {
-        actor: this.data,
+        actor: this.actor,
         roll: {},
       };
       actorObject.targetAttack(rollData, attack, {

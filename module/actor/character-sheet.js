@@ -31,7 +31,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
           initial: "attributes",
         },
       ],
-    });
+    }]);
   }
 
   generateScores() {
@@ -177,22 +177,20 @@ export class OseActorSheetCharacter extends OseActorSheet {
       const itemData = {
         name: `New ${type.capitalize()}`,
         type: type,
-        data: duplicate(header.dataset),
+        system: duplicate(header.dataset),
       };
-      delete itemData.data["type"];
-      return this.actor.createOwnedItem(itemData);
+      delete itemData.system["type"];
+      return this.actor.createEmbeddedDocuments("Item", [itemData]);
     });
 
     //Toggle Equipment
     html.find(".item-toggle").click(async (ev) => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.getOwnedItem(li.data("itemId"));
-      await this.actor.updateOwnedItem({
+      await this.actor.updateEmbeddedDocuments("Item", [{
         _id: li.data("itemId"),
-        data: {
-          equipped: !item.system.equipped,
-        },
-      });
+        "system.equipped": !item.system.equipped
+      }]);
     });
 
     html
