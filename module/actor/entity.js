@@ -7,7 +7,7 @@ export class OseActor extends Actor {
 
   prepareData() {
     super.prepareData();
-    const data = this.data.data;
+    const data = this.system;
 
     // Compute modifiers from actor scores
     this.computeModifiers();
@@ -35,10 +35,10 @@ export class OseActor extends Actor {
       return;
     }
     let modified = Math.floor(
-      value + (this.data.data.details.xp.bonus * value) / 100
+      value + (this.system.details.xp.bonus * value) / 100
     );
     return this.update({
-      "data.details.xp.value": modified + this.data.data.details.xp.value,
+      "system.details.xp.value": modified + this.system.details.xp.value,
     }).then(() => {
       const speaker = ChatMessage.getSpeaker({ actor: this });
       ChatMessage.create({
@@ -52,7 +52,7 @@ export class OseActor extends Actor {
   }
 
   isNew() {
-    const data = this.data.data;
+    const data = this.system;
     if (this.data.type == "character") {
       let ct = 0;
       Object.values(data.scores).forEach((el) => {
@@ -77,7 +77,7 @@ export class OseActor extends Actor {
       }
     }
     this.update({
-      "data.saves": {
+      "system.saves": {
         death: {
           value: saves.d,
         },
@@ -102,7 +102,7 @@ export class OseActor extends Actor {
   /* -------------------------------------------- */
 
   rollHP(options = {}) {
-    let roll = new Roll(this.data.data.hp.hd).roll();
+    let roll = new Roll(this.system.hp.hd).roll();
     return this.update({
       data: {
         actor: this.data,
@@ -122,7 +122,7 @@ export class OseActor extends Actor {
       actor: this.data,
       roll: {
         type: "above",
-        target: this.data.data.saves[save].value,
+        target: this.system.saves[save].value,
       },
       details: game.i18n.format("OSE.roll.details.save", { save: label }),
     };
@@ -148,7 +148,7 @@ export class OseActor extends Actor {
       actor: this.data,
       roll: {
         type: "below",
-        target: this.data.data.details.morale,
+        target: this.system.details.morale,
       },
     };
 
@@ -172,7 +172,7 @@ export class OseActor extends Actor {
       actor: this.data,
       roll: {
         type: "below",
-        target: this.data.data.retainer.loyalty,
+        target: this.system.retainer.loyalty,
       },
     };
 
@@ -231,13 +231,13 @@ export class OseActor extends Actor {
 
   rollCheck(score, options = {}) {
     const label = game.i18n.localize(`OSE.scores.${score}.long`);
-    const rollParts = ["1d20", this.data.data.details.level, this.data.data.scores[score].mod];
+    const rollParts = ["1d20", this.system.details.level, this.system.scores[score].mod];
 
     const data = {
       actor: this.data,
       roll: {
         type: "check",
-        target: this.data.data.scores[score].value,
+        target: this.system.scores[score].value,
       },
 
       details: game.i18n.format("OSE.roll.details.attribute", {
@@ -261,9 +261,9 @@ export class OseActor extends Actor {
 
   rollHitDice(options = {}) {
     const label = game.i18n.localize(`OSE.roll.hd`);
-    const rollParts = [this.data.data.hp.hd];
+    const rollParts = [this.system.hp.hd];
     if (this.data.type == "character") {
-      rollParts.push(this.data.data.scores.con.mod);
+      rollParts.push(this.system.scores.con.mod);
     }
 
     const data = {
@@ -289,10 +289,10 @@ export class OseActor extends Actor {
     const rollParts = [];
     let label = "";
     if (options.check == "wilderness") {
-      rollParts.push(this.data.data.details.appearing.w);
+      rollParts.push(this.system.details.appearing.w);
       label = "(2)";
     } else {
-      rollParts.push(this.data.data.details.appearing.d);
+      rollParts.push(this.system.details.appearing.d);
       label = "(1)";
     }
     const data = {
@@ -324,7 +324,7 @@ export class OseActor extends Actor {
       actor: this.data,
       roll: {
         type: "below",
-        target: this.data.data.exploration[expl],
+        target: this.system.exploration[expl],
       },
       details: game.i18n.format("OSE.roll.details.exploration", {
         expl: label,
@@ -346,7 +346,7 @@ export class OseActor extends Actor {
   }
 
   rollDamage(attData, options = {}) {
-    const data = this.data.data;
+    const data = this.system;
 
     const rollData = {
       actor: this.data,
@@ -395,7 +395,7 @@ export class OseActor extends Actor {
   }
 
   rollAttack(attData, options = {}) {
-    const data = this.data.data;
+    const data = this.system;
     const rollParts = ["1d20"];
     const dmgParts = [];
     let label = game.i18n.format("OSE.roll.attacks", {
@@ -461,14 +461,14 @@ export class OseActor extends Actor {
 
   async applyDamage(amount = 0, multiplier = 1) {
     amount = Math.floor(parseInt(amount) * multiplier);
-    const hp = this.data.data.hp;
+    const hp = this.system.hp;
 
     // Remaining goes to health
     const dh = Math.clamped(hp.value - amount, 0, hp.max);
 
     // Update the Actor
     return this.update({
-      "data.hp.value": dh,
+      "system.hp.value": dh,
     });
   }
 
@@ -483,13 +483,13 @@ export class OseActor extends Actor {
   }
 
   _isSlow() {
-    this.data.data.isSlow = false;
+    this.system.isSlow = false;
     if (this.data.type != "character") {
       return;
     }
     this.data.items.forEach((item) => {
       if (item.type == "weapon" && item.data.slow && item.data.equipped) {
-        this.data.data.isSlow = true;
+        this.system.isSlow = true;
         return;
       }
     });
@@ -499,7 +499,7 @@ export class OseActor extends Actor {
     if (this.data.type != "character") {
       return;
     }
-    const data = this.data.data;
+    const data = this.system;
     let option = game.settings.get("ose", "encumbranceOption");
 
     // Compute encumbrance
@@ -537,7 +537,7 @@ export class OseActor extends Actor {
   }
 
   _calculateMovement() {
-    const data = this.data.data;
+    const data = this.system;
     let option = game.settings.get("ose", "encumbranceOption");
     let weight = data.encumbrance.value;
     let delta = data.encumbrance.max - 1600;
@@ -586,7 +586,7 @@ export class OseActor extends Actor {
     if (this.data.type != "character") {
       return;
     }
-    const data = this.data.data;
+    const data = this.system;
     // Compute treasure
     let total = 0;
     let treasure = this.data.items.filter(
@@ -607,7 +607,7 @@ export class OseActor extends Actor {
     let baseAac = 10;
     let AcShield = 0;
     let AacShield = 0;
-    const data = this.data.data;
+    const data = this.system;
     data.aac.naked = baseAac + data.scores.dex.mod;
     data.ac.naked = baseAc - data.scores.dex.mod;
     const armors = this.data.items.filter((i) => i.type == "armor");
@@ -630,7 +630,7 @@ export class OseActor extends Actor {
     if (this.data.type != "character") {
       return;
     }
-    const data = this.data.data;
+    const data = this.system;
 
     const standard = {
       0: -3,

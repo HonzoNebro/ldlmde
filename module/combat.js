@@ -22,7 +22,7 @@ export class OseCombat {
       if (!data.combatants[i].actor) {
         return;
       }
-      if (data.combatants[i].actor.data.data.isSlow) {
+      if (data.combatants[i].actor.system.isSlow) {
         data.combatants[i].initiative = -789;
       } else {
         data.combatants[i].initiative =
@@ -73,8 +73,8 @@ export class OseCombat {
       if (i > 0) chatData.sound = null;   // Only play 1 sound for the whole set
       messages.push(chatData);
     });
-    await combat.updateEmbeddedEntity("Combatant", updates);
-    await CONFIG.ChatMessage.entityClass.create(messages);
+    await combat.updateEmbeddedDocuments("Combatant", updates);
+    await CONFIG.ChatMessage.documentClass.create(messages);
     data.turn = 0;
   }
 
@@ -123,7 +123,7 @@ export class OseCombat {
   static updateCombatant(combat, combatant, data) {
     let init = game.settings.get("ose", "initiative");
     // Why do you reroll ?
-    if (combatant.actor.data.data.isSlow) {
+    if (combatant.actor.system.isSlow) {
       data.initiative = -789;
       return;
     }
@@ -172,7 +172,7 @@ export class OseCombat {
       }
       let data = {};
       OseCombat.rollInitiative(game.combat, data);
-      game.combat.update({ data: data }).then(() => {
+      game.combat.update({ "system": data }).then(() => {
         game.combat.setupTurns();
       });
     });
