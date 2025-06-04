@@ -31,7 +31,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
           initial: "attributes",
         },
       ],
-    });
+    }]);
   }
 
   generateScores() {
