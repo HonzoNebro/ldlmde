@@ -91,7 +91,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
   }
 
   _pushLang(table) {
-    const data = this.actor.data.data;
+    const data = this.actor.system;
     let update = duplicate(data[table]);
     this._chooseLang().then((dialogInput) => {
       const name = CONFIG.OSE.languages[dialogInput.choice];
@@ -102,16 +102,16 @@ export class OseActorSheetCharacter extends OseActorSheet {
       }
       let newData = {};
       newData[table] = update;
-      return this.actor.update({ data: newData });
+      return this.actor.update({ "system": newData });
     });
   }
 
   _popLang(table, lang) {
-    const data = this.actor.data.data;
+    const data = this.actor.system;
     let update = data[table].value.filter((el) => el != lang);
     let newData = {};
     newData[table] = { value: update };
-    return this.actor.update({ data: newData });
+    return this.actor.update({ "system": newData });
   }
 
   /* -------------------------------------------- */
@@ -120,7 +120,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
     event.preventDefault();
     const itemId = event.currentTarget.closest(".item").dataset.itemId;
     const item = this.actor.getOwnedItem(itemId);
-    return item.update({ "data.quantity.value": parseInt(event.target.value) });
+    return item.update({ "system.quantity.value": parseInt(event.target.value) });
   }
 
   _onShowModifiers(event) {
@@ -177,22 +177,20 @@ export class OseActorSheetCharacter extends OseActorSheet {
       const itemData = {
         name: `New ${type.capitalize()}`,
         type: type,
-        data: duplicate(header.dataset),
+        system: duplicate(header.dataset),
       };
-      delete itemData.data["type"];
-      return this.actor.createOwnedItem(itemData);
+      delete itemData.system["type"];
+      return this.actor.createEmbeddedDocuments("Item", [itemData]);
     });
 
     //Toggle Equipment
     html.find(".item-toggle").click(async (ev) => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.getOwnedItem(li.data("itemId"));
-      await this.actor.updateOwnedItem({
+      await this.actor.updateEmbeddedDocuments("Item", [{
         _id: li.data("itemId"),
-        data: {
-          equipped: !item.data.data.equipped,
-        },
-      });
+        "system.equipped": !item.system.equipped
+      }]);
     });
 
     html
