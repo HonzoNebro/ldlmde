@@ -1,12 +1,17 @@
 {
-  "name": "ldlmde",
+  "id": "ldlmde",
   "title": "Leyendas de la Marca del Este",
   "description": "Implementación del sistema de juego Leyendas de la Marca del Este para Foundry Virtual Tabletop.",
   "version": "2.0.0",
-  "minimumCoreVersion": "12",
-  "compatibleCoreVersion": "12",
-  "templateVersion": 1,
-  "author": "Sergio Cotelo",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "authors": [
+    {
+      "name": "Sergio Cotelo"
+    }
+  ],
   "esmodules": [
     "ose.js"
   ],
@@ -26,13 +31,11 @@
       "path": "lang/es.json"
     }
   ],
-  "gridDistance": 1.5,
-  "gridUnits": "m",
+  "grid": {
+    "distance": 1.5,
+    "units": "m"
+  },
   "url": "https://github.com/serxoz/ldlmde/",
   "manifest": "https://raw.githubusercontent.com/serxoz/ldlmde/main/system.json",
-  "download": "https://github.com/serxoz/ldlmde/archive/2.0.0.zip",
-  "compatibility": {
-    "minimum": "12",
-    "verified": "12"
-  }
+  "download": "https://github.com/serxoz/ldlmde/archive/2.0.0.zip"
 }

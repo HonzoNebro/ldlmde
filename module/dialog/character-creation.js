@@ -2,6 +2,20 @@ import { OseActor } from '../actor/entity.js';
 import { OseDice } from "../dice.js";
 
 export class OseCharacterCreator extends FormApplication {
+  constructor(...args) {
+    super(...args);
+    this.counters = {
+      str: 0,
+      wis: 0,
+      dex: 0,
+      int: 0,
+      cha: 0,
+      con: 0,
+      gold: 0,
+    };
+    this.stats = { sum: 0, avg: 0, std: 0 };
+  }
+
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.classes = ["ose", "dialog", "creator"],
@@ -29,24 +43,13 @@ export class OseCharacterCreator extends FormApplication {
    * @return {Object}
    */
   getData() {
-    let data = this.object.data;
-    data.user = game.user;
-    data.config = CONFIG.OSE;
-    data.counters = {
-      str: 0,
-      wis: 0,
-      dex: 0,
-      int: 0,
-      cha: 0,
-      con: 0,
-      gold: 0
-    }
-    data.stats = {
-      sum: 0,
-      avg: 0,
-      std: 0
-    }
-    return data;
+    return {
+      system: this.object.system,
+      user: game.user,
+      config: CONFIG.OSE,
+      counters: this.counters,
+      stats: this.stats,
+    };
   }
 
   /* -------------------------------------------- */
@@ -74,16 +77,16 @@ export class OseCharacterCreator extends FormApplication {
       $(ev.currentTarget).closest('form').find('button[type="submit"]').removeAttr('disabled');
     }
 
-    this.object.data.stats = {
+    this.stats = {
       sum: sum,
       avg: Math.round(10 * sum / n) / 10,
-      std: Math.round(100 * std) / 100
-    }
+      std: Math.round(100 * std) / 100,
+    };
   }
 
   rollScore(score, options = {}) {
     // Increase counter
-    this.object.data.counters[score]++;
+    this.counters[score]++;
 
     const label = score != "gold" ? game.i18n.localize(`OSE.scores.${score}.long`) : "Silver";
     const rollParts = ["3d6"];
@@ -99,8 +102,8 @@ export class OseCharacterCreator extends FormApplication {
       data: data,
       skipDialog: true,
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: game.i18n.format('OSE.dialog.generateScore', { score: label, count: this.object.data.counters[score] }),
-      title: game.i18n.format('OSE.dialog.generateScore', { score: label, count: this.object.data.counters[score] }),
+      flavor: game.i18n.format('OSE.dialog.generateScore', { score: label, count: this.counters[score] }),
+      title: game.i18n.format('OSE.dialog.generateScore', { score: label, count: this.counters[score] }),
     });
   }
 
@@ -119,7 +122,7 @@ export class OseCharacterCreator extends FormApplication {
       config: CONFIG.OSE,
       scores: scores,
       title: game.i18n.localize("OSE.dialog.generator"),
-      stats: this.object.data.stats,
+      stats: this.stats,
       gold: gold
     }
     const content = await renderTemplate("/systems/ldlmde/templates/chat/roll-creation.html", templateData)
@@ -161,14 +164,14 @@ export class OseCharacterCreator extends FormApplication {
       name: "PO",
       type: "item",
       img: "/systems/ldlmde/assets/gold.png",
-      data: {
+      system: {
         treasure: true,
         cost: 1,
         weight: 1,
         quantity: {
-          value: gold
-        }
-      }
+          value: gold,
+        },
+      },
     };
     this.object.createEmbeddedDocuments("Item", [itemData]);
   }

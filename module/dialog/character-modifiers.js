@@ -29,9 +29,10 @@ export class OseCharacterModifiers extends FormApplication {
    * @return {Object}
    */
   getData() {
-    let data = this.object.data;
-    data.user = game.user;
-    return data;
+    return {
+      system: this.object.system,
+      user: game.user,
+    };
   }
 
   /* -------------------------------------------- */

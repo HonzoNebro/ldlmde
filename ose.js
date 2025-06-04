@@ -47,7 +47,6 @@ Hooks.once("init", async function () {
   const DocumentSheetConfig = window.DocumentSheetConfig ?? foundry.applications.DocumentSheetConfig;
 
   DocumentSheetConfig.unregisterSheet(Actor, "core", ActorSheet);
-
   DocumentSheetConfig.registerSheet(Actor, "ldlmde", OseActorSheetCharacter, {
     types: ["character"],
     makeDefault: true,
