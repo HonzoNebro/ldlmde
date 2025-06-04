@@ -19,7 +19,7 @@ export class OseActor extends Actor {
     // Determine Initiative
     if (game.settings.get("ose", "initiative") != "group") {
       data.initiative.value = data.initiative.mod;
-      if (this.data.type == "character") {
+      if (this.type == "character") {
         data.initiative.value += data.scores.dex.mod;
       }
     } else {
@@ -31,7 +31,7 @@ export class OseActor extends Actor {
   /*  Socket Listeners and Handlers
     /* -------------------------------------------- */
   getExperience(value, options = {}) {
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
     let modified = Math.floor(
@@ -53,13 +53,13 @@ export class OseActor extends Actor {
 
   isNew() {
     const data = this.system;
-    if (this.data.type == "character") {
+    if (this.type == "character") {
       let ct = 0;
       Object.values(data.scores).forEach((el) => {
         ct += el.value;
       });
       return ct == 0 ? true : false;
-    } else if (this.data.type == "monster") {
+    } else if (this.type == "monster") {
       let ct = 0;
       Object.values(data.saves).forEach((el) => {
         ct += el.value;
@@ -104,13 +104,8 @@ export class OseActor extends Actor {
   rollHP(options = {}) {
     let roll = new Roll(this.system.hp.hd).roll();
     return this.update({
-      data: {
-        actor: this.data,
-        hp: {
-          max: roll.total,
-          value: roll.total,
-        },
-      },
+      "system.hp.max": roll.total,
+      "system.hp.value": roll.total,
     });
   }
 
@@ -119,7 +114,7 @@ export class OseActor extends Actor {
     const rollParts = ["1d20"];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "above",
         target: this.system.saves[save].value,
@@ -145,7 +140,7 @@ export class OseActor extends Actor {
     const rollParts = ["2d6"];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "below",
         target: this.system.details.morale,
@@ -169,7 +164,7 @@ export class OseActor extends Actor {
     const rollParts = ["2d6"];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "below",
         target: this.system.retainer.loyalty,
@@ -192,24 +187,24 @@ export class OseActor extends Actor {
     const rollParts = ["2d6"];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "table",
         table: {
           2: game.i18n.format("OSE.reaction.Hostile", {
-            name: this.data.name,
+            name: this.name,
           }),
           3: game.i18n.format("OSE.reaction.Unfriendly", {
-            name: this.data.name,
+            name: this.name,
           }),
           6: game.i18n.format("OSE.reaction.Neutral", {
-            name: this.data.name,
+            name: this.name,
           }),
           9: game.i18n.format("OSE.reaction.Indifferent", {
-            name: this.data.name,
+            name: this.name,
           }),
           12: game.i18n.format("OSE.reaction.Friendly", {
-            name: this.data.name,
+            name: this.name,
           }),
         },
       },
@@ -234,7 +229,7 @@ export class OseActor extends Actor {
     const rollParts = ["1d20", this.system.details.level, this.system.scores[score].mod];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "check",
         target: this.system.scores[score].value,
@@ -262,12 +257,12 @@ export class OseActor extends Actor {
   rollHitDice(options = {}) {
     const label = game.i18n.localize(`OSE.roll.hd`);
     const rollParts = [this.system.hp.hd];
-    if (this.data.type == "character") {
+    if (this.type == "character") {
       rollParts.push(this.system.scores.con.mod);
     }
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "hitdice",
       },
@@ -296,7 +291,7 @@ export class OseActor extends Actor {
       label = "(1)";
     }
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: {
           type: "appearing",
@@ -321,7 +316,7 @@ export class OseActor extends Actor {
     const rollParts = ["1d6"];
 
     const data = {
-      actor: this.data,
+      actor: this,
       roll: {
         type: "below",
         target: this.system.exploration[expl],
@@ -349,7 +344,7 @@ export class OseActor extends Actor {
     const data = this.system;
 
     const rollData = {
-      actor: this.data,
+      actor: this,
       item: attData.item,
       roll: {
         type: "damage",
@@ -399,7 +394,7 @@ export class OseActor extends Actor {
     const rollParts = ["1d20"];
     const dmgParts = [];
     let label = game.i18n.format("OSE.roll.attacks", {
-      name: this.data.name,
+      name: this.name,
     });
     if (!attData.item) {
       dmgParts.push("1d6");
@@ -407,7 +402,7 @@ export class OseActor extends Actor {
       label = game.i18n.format("OSE.roll.attacksWith", {
         name: attData.item.name,
       });
-      dmgParts.push(attData.item.data.damage);
+      dmgParts.push(attData.item.system.damage);
     }
 
     let ascending = game.settings.get("ose", "ascendingAC");
@@ -428,15 +423,15 @@ export class OseActor extends Actor {
         data.scores.str.mod.toString(),
       );
     }
-    if (attData.item && attData.item.data.bonus) {
-      rollParts.push(attData.item.data.bonus);
+    if (attData.item && attData.item.system.bonus) {
+      rollParts.push(attData.item.system.bonus);
     }
     let thac0 = data.thac0.value;
     if (options.type == "melee") {
       ;
     }
     const rollData = {
-      actor: this.data,
+      actor: this,
       item: attData.item,
       roll: {
         type: options.type,
@@ -484,11 +479,11 @@ export class OseActor extends Actor {
 
   _isSlow() {
     this.system.isSlow = false;
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
-    this.data.items.forEach((item) => {
-      if (item.type == "weapon" && item.data.slow && item.data.equipped) {
+    this.items.forEach((item) => {
+      if (item.type == "weapon" && item.system.slow && item.system.equipped) {
         this.system.isSlow = true;
         return;
       }
@@ -496,7 +491,7 @@ export class OseActor extends Actor {
   }
 
   computeEncumbrance() {
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
     const data = this.system;
@@ -505,17 +500,17 @@ export class OseActor extends Actor {
     // Compute encumbrance
     let totalWeight = 0;
     let hasItems = false;
-    Object.values(this.data.items).forEach((item) => {
-      if (item.type == "item" && !item.data.treasure) {
+    this.items.forEach((item) => {
+      if (item.type == "item" && !item.system.treasure) {
         hasItems = true;
       }
       if (
         item.type == "item" &&
-        (["complete", "disabled"].includes(option) || item.data.treasure)
+        (["complete", "disabled"].includes(option) || item.system.treasure)
       ) {
-        totalWeight += item.data.quantity.value * item.data.weight;
+        totalWeight += item.system.quantity.value * item.system.weight;
       } else if (option != "basic" && ["weapon", "armor"].includes(item.type)) {
-        totalWeight += item.data.weight;
+        totalWeight += item.system.weight;
       }
     });
     if (option === "detailed" && hasItems) totalWeight += 80;
@@ -554,13 +549,13 @@ export class OseActor extends Actor {
         data.movement.base = 120;
       }
     } else if (option == "basic") {
-      const armors = this.data.items.filter((i) => i.type == "armor");
+      const armors = this.items.filter((i) => i.type == "armor");
       let heaviest = 0;
       armors.forEach((a) => {
-        if (a.data.equipped) {
-          if (a.data.type == "light" && heaviest == 0) {
+        if (a.system.equipped) {
+          if (a.system.type == "light" && heaviest == 0) {
             heaviest = 1;
-          } else if (a.data.type == "heavy") {
+          } else if (a.system.type == "heavy") {
             heaviest = 2;
           }
         }
@@ -583,23 +578,23 @@ export class OseActor extends Actor {
   }
 
   computeTreasure() {
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
     const data = this.system;
     // Compute treasure
     let total = 0;
-    let treasure = this.data.items.filter(
-      (i) => i.type == "item" && i.data.treasure
+    let treasure = this.items.filter(
+      (i) => i.type == "item" && i.system.treasure
     );
     treasure.forEach((item) => {
-      total += item.data.quantity.value * item.data.cost;
+      total += item.system.quantity.value * item.system.cost;
     });
     data.treasure = total;
   }
 
   computeAC() {
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
     // Compute AC
@@ -610,14 +605,14 @@ export class OseActor extends Actor {
     const data = this.system;
     data.aac.naked = baseAac + data.scores.dex.mod;
     data.ac.naked = baseAc - data.scores.dex.mod;
-    const armors = this.data.items.filter((i) => i.type == "armor");
+    const armors = this.items.filter((i) => i.type == "armor");
     armors.forEach((a) => {
-      if (a.data.equipped && a.data.type != "shield") {
-        baseAc = a.data.ac.value;
-        baseAac = a.data.aac.value;
-      } else if (a.data.equipped && a.data.type == "shield") {
-        AcShield = a.data.ac.value;
-        AacShield = a.data.aac.value;
+      if (a.system.equipped && a.system.type != "shield") {
+        baseAc = a.system.ac.value;
+        baseAac = a.system.aac.value;
+      } else if (a.system.equipped && a.system.type == "shield") {
+        AcShield = a.system.ac.value;
+        AacShield = a.system.aac.value;
       }
     });
     data.aac.value = baseAac + data.scores.dex.mod + AacShield + data.aac.mod;
@@ -627,7 +622,7 @@ export class OseActor extends Actor {
   }
 
   computeModifiers() {
-    if (this.data.type != "character") {
+    if (this.type != "character") {
       return;
     }
     const data = this.system;

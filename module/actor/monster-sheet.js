@@ -138,15 +138,11 @@ export class OseActorSheetMonster extends OseActorSheet {
   }
 
   async _resetCounters(event) {
-    const weapons = this.actor.data.items.filter(i => i.type === 'weapon');
+    const weapons = this.actor.items.filter(i => i.type === 'weapon');
     for (let wp of weapons) {
       const item = this.actor.getOwnedItem(wp._id);
       await item.update({
-        data: {
-          counter: {
-            value: parseInt(wp.data.counter.max),
-          },
-        },
+        "system.counter.value": parseInt(wp.data.counter.max),
       });
     }
   }

@@ -3,7 +3,7 @@ export class OseCombat {
     // Check groups
     data.combatants = [];
     let groups = {};
-    combat.data.combatants.forEach((cbt) => {
+    combat.combatants.forEach((cbt) => {
       groups[cbt.flags.ose.group] = { present: true };
       data.combatants.push(cbt);
     });
@@ -43,7 +43,7 @@ export class OseCombat {
   static async individualInitiative(combat, data) {
     let updates = [];
     let messages = [];
-    combat.data.combatants.forEach((c, i) => {
+    combat.combatants.forEach((c, i) => {
       // This comes from foundry.js, had to remove the update turns thing
       // Roll initiative
       const cf = combat._getInitiativeFormula(c);
@@ -181,7 +181,7 @@ export class OseCombat {
   static addCombatant(combat, data, options, id) {
     let token = canvas.tokens.get(data.tokenId);
     let color = "black";
-    switch (token.data.disposition) {
+    switch (token.document.disposition) {
       case -1:
         color = "red";
         break;
