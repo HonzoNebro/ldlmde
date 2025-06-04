@@ -122,7 +122,7 @@ export class OseCharacterCreator extends FormApplication {
       stats: this.object.data.stats,
       gold: gold
     }
-    const content = await renderTemplate("/systems/ose/templates/chat/roll-creation.html", templateData)
+    const content = await renderTemplate("/systems/ldlmde/templates/chat/roll-creation.html", templateData)
     ChatMessage.create({
       content: content,
       speaker,

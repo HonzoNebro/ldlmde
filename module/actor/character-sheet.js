@@ -91,7 +91,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
   }
 
   _pushLang(table) {
-    const data = this.actor.data.data;
+    const data = this.actor.system;
     let update = duplicate(data[table]);
     this._chooseLang().then((dialogInput) => {
       const name = CONFIG.OSE.languages[dialogInput.choice];
@@ -102,16 +102,16 @@ export class OseActorSheetCharacter extends OseActorSheet {
       }
       let newData = {};
       newData[table] = update;
-      return this.actor.update({ data: newData });
+      return this.actor.update({ "system": newData });
     });
   }
 
   _popLang(table, lang) {
-    const data = this.actor.data.data;
+    const data = this.actor.system;
     let update = data[table].value.filter((el) => el != lang);
     let newData = {};
     newData[table] = { value: update };
-    return this.actor.update({ data: newData });
+    return this.actor.update({ "system": newData });
   }
 
   /* -------------------------------------------- */
@@ -120,7 +120,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
     event.preventDefault();
     const itemId = event.currentTarget.closest(".item").dataset.itemId;
     const item = this.actor.getOwnedItem(itemId);
-    return item.update({ "data.quantity.value": parseInt(event.target.value) });
+    return item.update({ "system.quantity.value": parseInt(event.target.value) });
   }
 
   _onShowModifiers(event) {
@@ -190,7 +190,7 @@ export class OseActorSheetCharacter extends OseActorSheet {
       await this.actor.updateOwnedItem({
         _id: li.data("itemId"),
         data: {
-          equipped: !item.data.data.equipped,
+          equipped: !item.system.equipped,
         },
       });
     });
